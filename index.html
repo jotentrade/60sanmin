@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>炫龍開運命理館－六十仙命吉方速查</title>
     <style>
-        body {font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;background: linear-gradient(135deg, #f5f7fa, #c3cfe2);margin:0; padding:20px;}
+        body {font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;background: linear-gradient(135deg, #f5f7fa, #c3cfe2);margin:0; padding:20px;color:#333;}
         .container {max-width: 960px;margin: 0 auto;background: white;border-radius: 16px;box-shadow: 0 10px 40px rgba(0,0,0,0.15);overflow: hidden;}
-        header {background: linear-gradient(90deg, #2c3e50, #e74c3c);color: white;padding: 30px 20px;text-align: center;}
-        h1 {margin:0;font-size: 36px;letter-spacing: 2px;}
-        .subtitle {margin: 8px 0 0 0;font-size: 18px;opacity: 0.95;}
+        header {background: linear-gradient(90deg, #2c3e50, #e74c3c);color: white;padding: 35px 20px;text-align: center;}
+        h1 {margin:0;font-size: 38px;letter-spacing: 3px;}
+        .subtitle {margin:10px 0 0 0;font-size: 19px;opacity: 0.95;}
         .main {padding: 30px;}
-        select {width: 100%;padding: 14px;font-size: 18px;border: 2px solid #e74c3c;border-radius: 10px;margin: 15px 0;}
-        button {background: #e74c3c;color: white;border: none;padding: 16px 40px;font-size: 19px;border-radius: 10px;cursor: pointer;width: 100%;margin-top: 10px;}
+        input, select {width: 100%;padding: 15px;font-size: 18px;border: 3px solid #e74c3c;border-radius: 10px;margin: 10px 0;box-sizing: border-box;}
+        button {background: #e74c3c;color: white;border: none;padding: 16px;font-size: 20px;border-radius: 10px;cursor: pointer;width: 100%;margin: 10px 0;font-weight: bold;}
         button:hover {background: #c0392b;}
-        .result {margin-top: 25px;padding: 25px;background: #f8f9fa;border-radius: 12px;border-left: 8px solid #27ae60;display: none;line-height: 1.7;}
-        .highlight {color: #e74c3c;font-weight: bold;font-size: 1.1em;}
-        .zodiac {background: #fff3cd;padding: 20px;border-radius: 10px;margin: 25px 0;font-size: 16px;}
+        .result {margin-top: 25px;padding: 25px;background: #f8f9fa;border-radius: 12px;border-left: 8px solid #27ae60;display: none;line-height: 1.8;}
+        .highlight {color: #e74c3c;font-weight: bold;font-size: 1.15em;}
+        .zodiac {background: #fff3cd;padding: 20px;border-radius: 10px;margin: 25px 0;font-size: 16.5px;}
+        .copy-btn {background: #27ae60;margin-top: 15px;}
     </style>
 </head>
 <body>
@@ -26,10 +27,12 @@
             <p class="subtitle">六十仙命清吉坐山 + 生肖吉方速查工具</p>
         </header>
         <div class="main">
-            <label><strong>選擇仙命干支：</strong></label>
+            <label><strong>搜尋或選擇仙命干支：</strong></label>
+            <input type="text" id="search" placeholder="輸入如：甲子、乙丑..." onkeyup="filterOptions()">
             <select id="xianming"></select>
-            <button onclick="query()">🔍 立即查詢清吉坐山與大利方</button>
+            <button onclick="query()">🔍 立即查詢</button>
             <div id="result" class="result"></div>
+
             <div class="zodiac">
                 <strong>十二生肖大利方參考表</strong><br><br>
                 鼠、龍、猴：大利西方　利北方　小利東方　煞南方<br>
@@ -37,9 +40,6 @@
                 虎、馬、狗：大利東方　利南方　小利西方　煞北方<br>
                 兔、羊、豬：大利北方　利東方　小利南方　煞西方
             </div>
-            <p style="text-align:center; color:#777; margin-top:30px; font-size:14px;">
-                炫龍開運命理館 提供 • 塔位選位 • 安葬擇日 • 立碑座向 專業建議
-            </p>
         </div>
     </div>
 
@@ -116,8 +116,17 @@
             });
         };
 
+        function filterOptions() {
+            const term = document.getElementById('search').value.toUpperCase();
+            const sel = document.getElementById('xianming');
+            Array.from(sel.options).forEach(opt => {
+                opt.style.display = opt.value.includes(term) ? '' : 'none';
+            });
+        }
+
         function query() {
             const key = document.getElementById('xianming').value;
+            if (!key) return;
             const d = data[key];
             const res = document.getElementById('result');
             res.innerHTML = `
@@ -126,8 +135,14 @@
                 <p><strong>清吉坐山：</strong><br><span class="highlight">${d.shan}</span></p>
                 <hr>
                 <p style="color:#555;">建議搭配上方生肖大利方一同參考，塔位選位、立碑、安葬擇日更吉祥。</p>
+                <button class="copy-btn" onclick="copyResult()">📋 一鍵複製結果</button>
             `;
             res.style.display = 'block';
+        }
+
+        function copyResult() {
+            const text = document.getElementById('result').innerText;
+            navigator.clipboard.writeText(text).then(() => alert('✅ 已複製到剪貼簿！'));
         }
     </script>
 </body>
