@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炫龍開運命理館－六十仙命吉方速查</title>
+    <style>
+        body {font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;background: linear-gradient(135deg, #f5f7fa, #c3cfe2);margin:0; padding:20px;}
+        .container {max-width: 960px;margin: 0 auto;background: white;border-radius: 16px;box-shadow: 0 10px 40px rgba(0,0,0,0.15);overflow: hidden;}
+        header {background: linear-gradient(90deg, #2c3e50, #e74c3c);color: white;padding: 30px 20px;text-align: center;}
+        h1 {margin:0;font-size: 36px;letter-spacing: 2px;}
+        .subtitle {margin: 8px 0 0 0;font-size: 18px;opacity: 0.95;}
+        .main {padding: 30px;}
+        select {width: 100%;padding: 14px;font-size: 18px;border: 2px solid #e74c3c;border-radius: 10px;margin: 15px 0;}
+        button {background: #e74c3c;color: white;border: none;padding: 16px 40px;font-size: 19px;border-radius: 10px;cursor: pointer;width: 100%;margin-top: 10px;}
+        button:hover {background: #c0392b;}
+        .result {margin-top: 25px;padding: 25px;background: #f8f9fa;border-radius: 12px;border-left: 8px solid #27ae60;display: none;line-height: 1.7;}
+        .highlight {color: #e74c3c;font-weight: bold;font-size: 1.1em;}
+        .zodiac {background: #fff3cd;padding: 20px;border-radius: 10px;margin: 25px 0;font-size: 16px;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐉 炫龍開運命理館</h1>
+            <p class="subtitle">六十仙命清吉坐山 + 生肖吉方速查工具</p>
+        </header>
+        <div class="main">
+            <label><strong>選擇仙命干支：</strong></label>
+            <select id="xianming"></select>
+            <button onclick="query()">🔍 立即查詢清吉坐山與大利方</button>
+            <div id="result" class="result"></div>
+            <div class="zodiac">
+                <strong>十二生肖大利方參考表</strong><br><br>
+                鼠、龍、猴：大利西方　利北方　小利東方　煞南方<br>
+                牛、蛇、雞：大利南方　利西方　小利北方　煞東方<br>
+                虎、馬、狗：大利東方　利南方　小利西方　煞北方<br>
+                兔、羊、豬：大利北方　利東方　小利南方　煞西方
+            </div>
+            <p style="text-align:center; color:#777; margin-top:30px; font-size:14px;">
+                炫龍開運命理館 提供 • 塔位選位 • 安葬擇日 • 立碑座向 專業建議
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            "甲子": { ny: "金", shan: "巽山木，坤山土，庚山金，酉山金，辛山金，戌山土，乾山金" },
+            "乙丑": { ny: "金", shan: "巽山木，坤山土，庚山金，辛山金" },
+            "丙寅": { ny: "火", shan: "寅山木，乙山木，辰山土，巽山木，丙山火，丁山火，乾山金" },
+            "丁卯": { ny: "火", shan: "丑山土，艮山土，坤山土，乾山金" },
+            "戊辰": { ny: "木", shan: "壬山水，癸山水，坤山土" },
+            "己巳": { ny: "木", shan: "艮山土，午山火，丁山火，未山土，坤山土" },
+            "庚午": { ny: "土", shan: "艮山土，辰山土，乾山金" },
+            "辛未": { ny: "土", shan: "壬山水，癸山水，艮山土，乾山金" },
+            "壬申": { ny: "金", shan: "壬山水，癸山水，巽山木，酉山金，辛山金，戌山土，乾山金" },
+            "癸酉": { ny: "金", shan: "艮山土，巽山木，未山土，坤山土" },
+            "甲戌": { ny: "火", shan: "艮山土，甲山木，卯山木，乙山木，巽山木，丙山火，丁山火" },
+            "乙亥": { ny: "火", shan: "丑山土，艮山土，甲山木，乙山木，坤山土" },
+            "丙子": { ny: "水", shan: "巽山木，庚山金，酉山金，辛山金，乾山金" },
+            "丁丑": { ny: "水", shan: "巽山木，丙山火，丁山火，庚山金，辛山金" },
+            "戊寅": { ny: "土", shan: "辰山土，丙山火，丁山火，乾山金" },
+            "己卯": { ny: "土", shan: "壬山水，癸山水，丑山土，艮山土，坤山土，乾山金" },
+            "庚辰": { ny: "金", shan: "壬山水，癸山水，坤山土，庚山金，酉山金，辛山金，乾山金" },
+            "辛巳": { ny: "金", shan: "艮山土，未山土，坤山土，庚山金，辛山金" },
+            "壬午": { ny: "木", shan: "艮山土，甲山木，卯山木，乙山木，辰山土，巽山木" },
+            "癸未": { ny: "木", shan: "壬山水，癸山水，艮山土，甲山木，乙山木" },
+            "甲申": { ny: "水", shan: "壬山水，癸山水，巽山木，酉山金，辛山金，乾山金" },
+            "乙酉": { ny: "水", shan: "巽山木，丙山火，午山火，丁山火" },
+            "丙戌": { ny: "土", shan: "艮山土，丙山火，丁山火" },
+            "丁亥": { ny: "土", shan: "子山水，癸山水，丑山土，艮山土，坤山土" },
+            "戊子": { ny: "火", shan: "巽山木，坤山土，庚山金，酉山金，辛山金，戌山土，乾山金" },
+            "己丑": { ny: "火", shan: "巽山木，丙山火，丁山火，坤山土，庚山金，辛山金" },
+            "庚寅": { ny: "木", shan: "卯山木，乙山木，辰山土，巽山木，丁山火" },
+            "辛卯": { ny: "木", shan: "壬山水，癸山水，丑山土，艮山土，坤山土" },
+            "壬辰": { ny: "水", shan: "壬山水，癸山水，庚山金，酉山金，辛山金，乾山金" },
+            "癸巳": { ny: "水", shan: "午山火，丁山火，庚山金，辛山金" },
+            "甲午": { ny: "金", shan: "艮山土，甲山木，卯山木，乙山木，辰山土，巽山木，乾山金" },
+            "乙未": { ny: "金", shan: "壬山水，癸山水，艮山土，甲山木，乙山木，乾山金" },
+            "丙申": { ny: "火", shan: "巽山木，酉山金，辛山金，戌山土，乾山金" },
+            "丁酉": { ny: "火", shan: "艮山土，巽山木，丙山火，午山火，丁山火，未山土，坤山土" },
+            "戊戌": { ny: "木", shan: "艮山土，甲山木，卯山木，乙山木，巽山木，丙山火，丁山火" },
+            "己亥": { ny: "木", shan: "子山水，癸山水，丑山土，艮山土，乙山木，坤山土" },
+            "庚子": { ny: "土", shan: "坤山土，庚山金，酉山金，辛山金，戌山土，乾山金" },
+            "辛丑": { ny: "土", shan: "丙山火，丁山火，坤山土，庚山金，辛山金" },
+            "壬寅": { ny: "金", shan: "卯山木，乙山木，辰山土，巽山木，乾山金" },
+            "癸卯": { ny: "金", shan: "壬山水，癸山水，丑山土，艮山土，坤山土，乾山金" },
+            "甲辰": { ny: "火", shan: "坤山土，庚山金，酉山金，辛山金，乾山金" },
+            "乙巳": { ny: "火", shan: "艮山土，午山火，丁山火，未山土，坤山土，庚山金，辛山金" },
+            "丙午": { ny: "水", shan: "甲山木，卯山木，乙山木，巽山木，乾山金" },
+            "丁未": { ny: "水", shan: "壬山水，癸山水，甲山木，乙山木，乾山金" },
+            "戊申": { ny: "土", shan: "壬山水，癸山水，酉山金，辛山金，戌山土，乾山金" },
+            "己酉": { ny: "土", shan: "艮山土，丙山火，午山火，丁山火，未山土，坤山土" },
+            "庚戌": { ny: "金", shan: "艮山土，甲山木，卯山木，乙山木，巽山木" },
+            "辛亥": { ny: "金", shan: "子山水，癸山水，丑山土，艮山土，甲山木，乙山木，坤山土" },
+            "壬子": { ny: "木", shan: "巽山木，坤山土，戌山土" },
+            "癸丑": { ny: "木", shan: "巽山木，丙山火，丁山火，坤山土" },
+            "甲寅": { ny: "水", shan: "卯山木，乙山木，巽山木，丙山火，丁山火，乾山金" },
+            "乙卯": { ny: "水", shan: "壬山水，癸山水，乾山金" },
+            "丙辰": { ny: "土", shan: "壬山水，癸山水，坤山土，庚山金，酉山金，辛山金，乾山金" },
+            "丁巳": { ny: "土", shan: "艮山土，午山火，丁山火，未山土，坤山土，庚山金，辛山金" },
+            "戊午": { ny: "火", shan: "艮山土，甲山木，卯山木，乙山木，辰山土，巽山木，乾山金" },
+            "己未": { ny: "火", shan: "艮山土，甲山木，乙山木，乾山金" },
+            "庚申": { ny: "木", shan: "壬山水，癸山水，巽山木，戌山土" },
+            "辛酉": { ny: "木", shan: "艮山土，巽山木，丙山火，午山火，丁山火，未山土，坤山土" },
+            "壬戌": { ny: "水", shan: "甲山木，卯山木，乙山木，巽山木，丙山火，丁山火" },
+            "癸亥": { ny: "水", shan: "子山水，癸山水，甲山木，乙山木" }
+        };
+
+        window.onload = () => {
+            const sel = document.getElementById('xianming');
+            Object.keys(data).forEach(k => {
+                let opt = document.createElement('option');
+                opt.value = k; opt.textContent = k;
+                sel.appendChild(opt);
+            });
+        };
+
+        function query() {
+            const key = document.getElementById('xianming').value;
+            const d = data[key];
+            const res = document.getElementById('result');
+            res.innerHTML = `
+                <h2 style="margin:0 0 15px 0;color:#27ae60;">✅ ${key} 仙命 查詢結果</h2>
+                <p><strong>納音五行：</strong> <span class="highlight">${d.ny}</span></p>
+                <p><strong>清吉坐山：</strong><br><span class="highlight">${d.shan}</span></p>
+                <hr>
+                <p style="color:#555;">建議搭配上方生肖大利方一同參考，塔位選位、立碑、安葬擇日更吉祥。</p>
+            `;
+            res.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
